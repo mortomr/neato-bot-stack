@@ -1,0 +1,14 @@
+Goal	Command
+Start container	    ./ros2_docker/scripts/start.sh
+Stop container	    ./ros2_docker/scripts/stop.sh
+Clean workspace	    rm -rf ros_ws/build ros_ws/install ros_ws/log
+Rebuild image	    docker compose build
+Save changes	    Don’t use --rm and bind-mount your ros_ws
+
+
+
+
+https://www.amazon.com/dp/B07CW34YRB?ref=ppx_yo2ov_dt_b_fed_asin_title
+
+
+

@@ -1,0 +1,12 @@
+# Ignore build artifacts
+ros_ws/build/
+ros_ws/install/
+ros_ws/log/
+__pycache__/
+*.pyc
+*.egg-info
+
+# Ignore system clutter
+*.swp
+.vscode/
+*.bak
