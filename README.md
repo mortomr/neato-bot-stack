@@ -1,6 +1,6 @@
 README.md
 markdown
-Copy code
+ 
 # 🛠️ neato-bot-stack
 
 A portable ROS 2 Humble development stack for ARM64 robots — built and tested on Raspberry Pi 5 (Ubuntu Bookworm), using Docker, Arduino, and real-time control integration.
@@ -26,16 +26,16 @@ git clone https://github.com/YOUR_USERNAME/neato-bot-stack.git
 cd neato-bot-stack
 Build the Docker container:
 bash
-Copy code
+ 
 docker compose build --no-cache
 docker compose up -d
 Enter the container:
 bash
-Copy code
+ 
 docker exec -it ros2_humble bash
 🧱 Project Layout
 graphql
-Copy code
+ 
 ros2_docker/
 ├── Dockerfile
 ├── docker-compose.yml
@@ -55,16 +55,3 @@ Logs and builds are ignored via .gitignore
 📎 License
 MIT — use freely, credit welcome!
 
-yaml
-Copy code
-
----
-
-Paste this into `~/ros2_docker/README.md` and commit it:
-
-```bash
-cd ~/ros2_docker
-nano README.md  # paste the contents here
-git add README.md
-git commit -m "Add project README"
-git push
