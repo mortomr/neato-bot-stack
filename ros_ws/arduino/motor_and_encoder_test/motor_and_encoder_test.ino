@@ -1,4 +1,4 @@
-# motor_and_encoder_test.ino
+// # motor_and_encoder_test.ino
 // Arduino Uno version: ROS2-ready motor + encoder control
 
 // ==== Pin Definitions ====
@@ -68,12 +68,13 @@ void loop() {
 
 // ==== Command Handler ====
 void handleCommand(String cmd) {
+  if (cmd.length() == 0) return;  // Ignore blank lines
   if (cmd.startsWith("SET_LPWM ")) {
     int val = cmd.substring(9).toInt();
-    setMotor(PWM_LEFT, DIR_LEFT, val);
+    setMotor(PWM_RIGHT, DIR_RIGHT, -val);  // ← Right motor, flipped
   } else if (cmd.startsWith("SET_RPWM ")) {
     int val = cmd.substring(9).toInt();
-    setMotor(PWM_RIGHT, DIR_RIGHT, val);
+    setMotor(PWM_LEFT, DIR_LEFT, -val);   // ← Left motor, flipped
   } else if (cmd == "STOP_MOTORS") {
     setMotor(PWM_LEFT, DIR_LEFT, 0);
     setMotor(PWM_RIGHT, DIR_RIGHT, 0);
@@ -87,9 +88,12 @@ void handleCommand(String cmd) {
   }
 }
 
+
 // ==== Motor Driver ====
 void setMotor(int pwmPin, int dirPin, int power) {
   bool dir = (power >= 0);
+  if (pwmPin == PWM_LEFT) dir = !dir; // Flip left motor direction
+  if (pwmPin == PWM_LEFT || pwmPin == PWM_RIGHT) dir = !dir;
   int pwm = constrain(abs(power), 0, 255);
   digitalWrite(dirPin, dir ? HIGH : LOW);
   analogWrite(pwmPin, pwm);

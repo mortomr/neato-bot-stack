@@ -1,9 +1,6 @@
-# ros2_motor_bridge.py
-# ROS 2 node to bridge Arduino motor controller via serial
-
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Int32MultiArray, Int32
+from std_msgs.msg import Int32MultiArray
 import serial
 import threading
 import time
@@ -12,36 +9,48 @@ class MotorBridgeNode(Node):
     def __init__(self):
         super().__init__('motor_bridge_node')
 
-        # Serial port config
+        # Serial setup
         self.serial_port = serial.Serial('/dev/ttyACM0', 115200, timeout=0.1)
-        time.sleep(2)  # Let Arduino reset
+        time.sleep(2)  # Allow Arduino to reset
 
-        # ROS pubs/subs
+        # ROS setup
         self.encoder_pub = self.create_publisher(Int32MultiArray, 'wheel_ticks', 10)
         self.create_subscription(Int32MultiArray, 'motor_pwm', self.motor_cmd_cb, 10)
 
-        # Poll encoder data every 100ms
-        self.create_timer(0.1, self.query_encoders)
+        # Timers
+        self.create_timer(0.1, self.query_encoders)   # 10 Hz encoder polling
+        self.create_timer(0.1, self.watchdog_check)   # 10 Hz watchdog monitor
 
-        # Background reader thread
+        # State
+        self.last_cmd_time = self.get_clock().now()
         self.lock = threading.Lock()
-        self.buffer = []
+
+        # Serial read thread
         self.reader = threading.Thread(target=self.read_serial_loop, daemon=True)
         self.reader.start()
 
     def motor_cmd_cb(self, msg):
-        # Expect msg.data = [left_pwm, right_pwm]
         try:
             self.send_serial(f'SET_LPWM {msg.data[0]}')
             self.send_serial(f'SET_RPWM {msg.data[1]}')
+            self.last_cmd_time = self.get_clock().now()
         except Exception as e:
             self.get_logger().error(f"Motor command error: {e}")
+
+    def watchdog_check(self):
+        elapsed = self.get_clock().now() - self.last_cmd_time
+        if elapsed.nanoseconds * 1e-9 > 0.5:
+            self.send_serial("SET_LPWM 0")
+            self.send_serial("SET_RPWM 0")
 
     def query_encoders(self):
         self.send_serial("GET_ENCODERS")
 
     def send_serial(self, cmd):
+        if not cmd.strip():
+            return
         with self.lock:
+            print(f"→ {cmd}")
             self.serial_port.write((cmd + '\n').encode())
 
     def read_serial_loop(self):
@@ -57,7 +66,6 @@ class MotorBridgeNode(Node):
                     self.encoder_pub.publish(msg)
             except Exception:
                 pass
-
 
 def main():
     rclpy.init()

@@ -11,9 +11,12 @@ setup(
             ['resource/neato_bot_control']),
         ('share/neato_bot_control', ['package.xml']),
         ('share/neato_bot_control/launch', [
-            'neato_bot_control/launch/motor_bridge.launch.py'
+            'launch/motor_bridge.launch.py',
+            'launch/cmd_vel_to_pwm.launch.py',
         ]),
     ],
+
+
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='root',
@@ -21,11 +24,10 @@ setup(
     description='TODO: Package description',
     license='TODO: License declaration',
     tests_require=['pytest'],
-entry_points={
-    'console_scripts': [
-        'ros2_motor_bridge = neato_bot_control.ros2_motor_bridge:main',
-        'cmd_vel_listener = neato_bot_control.cmd_vel_listener:main'
-    ],
-},
-
+    entry_points={
+        'console_scripts': [
+            'ros2_motor_bridge = neato_bot_control.ros2_motor_bridge:main',
+            'cmd_vel_to_pwm = neato_bot_control.cmd_vel_to_pwm:main'
+        ],
+    },
 )

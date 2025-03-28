@@ -13,7 +13,10 @@ services:
     devices:
       - /dev/serial0:/dev/serial0
       - /dev/ttyAMA10:/dev/ttyAMA10
-    command: tail -f /dev/null
+    command: tail -f /dev/null &&
+          bash -c "source /ros_ws/install/setup.bash &&
+               ros2 run neato_bot_control ros2_motor_bridge &
+               ros2 run xv11_lidar xv11_lidar_node"
     environment:
       - GPIO_BASEADDR=0xFE000000
     volumes:

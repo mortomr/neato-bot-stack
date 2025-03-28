@@ -1,0 +1,20 @@
+{
+    "folders": [
+      {
+        "path": "."
+      }
+    ],
+    "settings": {
+      "terminal.integrated.cwd": "${workspaceFolder}",
+      "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/build": true,
+        "**/install": true,
+        "**/log": true
+      },
+      "python.analysis.autoSearchPaths": true,
+      "python.analysis.useLibraryCodeForTypes": true
+    }
+  }
+  
