@@ -1,14 +1,126 @@
-Goal	Command
-Start container	    ./ros2_docker/scripts/start.sh
-Stop container	    ./ros2_docker/scripts/stop.sh
-Clean workspace	    rm -rf ros_ws/build ros_ws/install ros_ws/log
-Rebuild image	    docker compose build
-Save changes	    Don’t use --rm and bind-mount your ros_ws
+# 🧠 Neato Bot ROS 2 + Docker Dev Cheatsheet
 
+## 🔄 Colcon Build & Setup
 
+```bash
+# Clean build
+rm -rf build/ install/ log/
 
+# Rebuild specific package
+colcon build --packages-select neato_bot_control
 
-https://www.amazon.com/dp/B07CW34YRB?ref=ppx_yo2ov_dt_b_fed_asin_title
+# Rebuild all packages
+colcon build
 
+# Source the environment
+source install/setup.bash
 
+# Add to .bashrc
+echo "source /ros_ws/install/setup.bash" >> ~/.bashrc
+🧠 Workspace Structure Tips
+bash
+Copy
+Edit
+# Make sure your ROS 2 packages are in this layout:
+ros_ws/
+└── src/
+    ├── neato_bot_control/
+    │   ├── launch/
+    │   └── neato_bot_control/
+    └── other_packages/
+🚀 Launching Nodes
+bash
+Copy
+Edit
+# Run main bringup launch (LIDAR + Motors + cmd_vel bridge)
+ros2 launch neato_bot_control bringup.launch.py
+
+# Individual launch files
+ros2 launch neato_bot_control motor_bridge.launch.py
+ros2 launch neato_bot_control cmd_vel_to_pwm.launch.py
+ros2 launch xv11_lidar lidar_launch.py
+📡 ROS 2 CLI
+bash
+Copy
+Edit
+# List topics
+ros2 topic list
+
+# Echo topic
+ros2 topic echo /cmd_vel
+ros2 topic echo /wheel_ticks
+
+# Publish manually
+ros2 topic pub /cmd_vel geometry_msgs/Twist '{linear: {x: 0.2}, angular: {z: 0.0}}'
+🐳 Docker Commands
+bash
+Copy
+Edit
+# Enter running container
+docker exec -it ros2_humble bash
+
+# Restart container
+docker restart ros2_humble
+
+# View logs
+docker logs -f ros2_humble
+🧼 Killing ROS Nodes & Resetting
+bash
+Copy
+Edit
+# Kill all running ROS 2 processes
+pkill -f ros2
+
+# Optional: clear Docker and relaunch
+docker stop ros2_humble
+docker start ros2_humble
+🖥️ Get Windows Product Key (before dual-boot)
+powershell
+Copy
+Edit
+(Get-WmiObject -query 'select * from SoftwareLicensingService').OA3xOriginalProductKey
+or
+
+cmd
+Copy
+Edit
+wmic path softwarelicensingservice get OA3xOriginalProductKey
+🧠 Debugging Gotchas
+bash
+Copy
+Edit
+# Make sure AMENT_PREFIX_PATH is not polluted
+unset AMENT_PREFIX_PATH
+
+# Ensure you're in correct shell
+exec bash
+🧪 Foxglove + Web Tools
+bash
+Copy
+Edit
+# WebSocket bridge on Foxglove side (Portainer or elsewhere)
+ros2 run foxglove_bridge foxglove_bridge
+
+# Use topic: /cmd_vel
+# Use topic: /wheel_ticks (Int32MultiArray)
+# Use topic: /scan (LaserScan)
+🛑 Permissions / Serial Access
+bash
+Copy
+Edit
+# Add user to dialout (serial access)
+sudo usermod -aG dialout $USER
+
+# On Pi or MiniPC: check serial port
+ls /dev/ttyACM*
+🎯 Rebuild & Resync When Nothing Works
+bash
+Copy
+Edit
+pkill -f ros2
+rm -rf build/ install/ log/
+colcon build
+source install/setup.bash
+ros2 launch neato_bot_control bringup.launch.py
+Save this as ROS2_CHEATSHEET.md or just drop it into your main repo README.md if you want easy access while working on the bot.
 
